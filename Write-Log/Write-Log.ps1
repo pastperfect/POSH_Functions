@@ -16,7 +16,7 @@ function Write-Log {
     Removed the timestamp from the log entry 
     
     .PARAMETER Overwrite
-    Removed the timestamp from the log entry   
+    Force it to overwrite the log defined in the path  
         
     .EXAMPLE
     Write-Log -Path C:\ProgramData\SoftwareInstall.log -Message "Install was successful"
@@ -39,13 +39,13 @@ function Write-Log {
         [String]$Message,
 
         [parameter(Position=2,
-        Mandatory=$true,
+        Mandatory=$False,
         ValueFromPipeline=$true,
         ParameterSetName='Default')]
         [Switch]$NoTimestamp,
 
-        [parameter(Position=2,
-        Mandatory=$true,
+        [parameter(Position=3,
+        Mandatory=$False,
         ValueFromPipeline=$true,
         ParameterSetName='Default')]
         [Switch]$Overwrite
@@ -53,19 +53,20 @@ function Write-Log {
     )
 
     begin {   
-        $RegPath = "Registry::$Path"
+        $TimeStamp = Get-Date -Format "dd/MM/yyyy HH:mm:ss"
     }
     process {
-        $Entry_Value = (Get-ItemProperty -Path $RegPath -ErrorAction SilentlyContinue).$Item
-
-        if ($Entry_Value -eq $Value) { 
-            $Output = $true        
+        if (!($NoTimestamp)) {
+            $LogEntry = "$TimeStamp : $Message"
         } else {
-            $Output = $false
+            $LogEntry = $Message
         }
-
     }
     end {
-        $Output
+        if (!($Overwrite)) {
+            Write-Output $LogEntry | Out-File $Path -Append
+        } else {
+            Write-Output $LogEntry | Out-File $Path 
+        }
     }
 }
