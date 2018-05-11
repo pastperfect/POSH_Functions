@@ -35,7 +35,7 @@ function Test-RegistryEntry {
         ParameterSetName='Default')]
         [String]$Item,
 
-        [parameter(Position=1,
+        [parameter(Position=2,
         Mandatory=$true,
         ValueFromPipeline=$true,
         ParameterSetName='Default')]
